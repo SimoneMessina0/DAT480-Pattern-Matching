@@ -1,3 +1,13 @@
+# DAT480 Project
+This repo (DAT480_project_base) is based on an open source UDP stack for Alveo FPGA boards, the XUP Vitis Network Example.
+Get it by:
+```sh
+git clone https://git.chalmers.se/magnusos/dat480_project_base.git --recursive
+```
+
+Below follows the original README.
+
+
 # XUP Vitis Network Example (VNx)
 
 This repository contains IP that you can use to add 100 Gbit/s networking to your Vitis designs. UDP is used as the transport protocol, and allows you to connect your Alveo card to other network equipment or Alveo cards. 
