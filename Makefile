@@ -6,7 +6,7 @@ help:
 	@echo "Makefile Usage:"
 	@echo "  make all DEVICE=<FPGA platform> INTERFACE=<CMAC Interface> DESIGN=<design name>"
 	@echo "      Command to generate the xo for specified device and Interface."
-	@echo "      By default, DEVICE=xilinx_u280_xdma_201920_3, INTERFACE=0  DESIGN=benchmark"
+	@echo "      By default, DEVICE=xilinx_u55c_gen3x16_xdma_3_202210_1, INTERFACE=0  DESIGN=benchmark"
 	@echo "      DESIGN also supports the string basic"
 	@echo ""
 	@echo "  make clean "
@@ -20,9 +20,9 @@ help:
 	@echo ""
 
 
-DEVICE ?= xilinx_u280_xdma_201920_3
+DEVICE ?= xilinx_u55c_gen3x16_xdma_3_202210_1
 INTERFACE ?= 0
-DESIGN ?= benchmark
+DESIGN ?= basic
 XCLBIN_NAME ?= vnx_$(DESIGN)_if$(INTERFACE)
 MAX_SOCKETS ?= 16
 
@@ -38,6 +38,8 @@ NETLAYERDIR = NetLayers/
 CMACDIR     = Ethernet/
 BASICDIR    = Basic_kernels/
 BENCHMARDIR = Benchmark_kernel/
+PROJDIR_HLS = Project_kernels_RTL/
+PROJDIR_RTL = Project_kernels_RTL/
 
 NETLAYERHLS = 100G-fpga-network-stack-core
 
@@ -66,9 +68,16 @@ ifeq (benchmark,$(DESIGN))
 	LIST_XO += $(BENCHMARDIR)$(TEMP_DIR)/collector.xo
 	LIST_XO += $(BENCHMARDIR)$(TEMP_DIR)/switch_wrapper.xo
 	LIST_REPOS += --user_ip_repo_paths $(SWITCH_IP_FOLDER)
-else
+else ifeq (basic,$(DESIGN))
 	LIST_XO += $(BASICDIR)$(TEMP_DIR)/krnl_mm2s.xo
 	LIST_XO += $(BASICDIR)$(TEMP_DIR)/krnl_s2mm.xo
+else ifeq (project,$(DESIGN))
+	LIST_XO += $(PROJDIR_HLS)$(TEMP_DIR)/krnl_proj.xo
+#	LIST_XO += $(PROJDIR_RTL)$(TEMP_DIR)/example.xo # Example of including an RTL kernel, uncomment if needed
+# If you need more kernels, just add them here
+# Either more of your own, or from the basic/benchmark folders
+else
+	$(error DESIGN=$(DESIGN) is not supported! Supported designs are: benchmark, basic, project)
 endif
 
 # Linker parameters
@@ -117,6 +126,12 @@ $(CMACDIR)$(TEMP_DIR)/%.xo:
 $(NETLAYERDIR)$(TEMP_DIR)/%.xo:
 	cd ./$(NETLAYERDIR)$(NETLAYERHLS) && git checkout -- .
 	make -C $(NETLAYERDIR) all DEVICE=$(DEVICE) MAX_SOCKETS=$(MAX_SOCKETS)
+
+$(PROJDIR_RTL)$(TEMP_DIR)/%.xo: $(PROJDIR_RTL)src/*
+	make -C $(PROJDIR_RTL) all DEVICE=$(DEVICE) -j3
+
+$(PROJDIR_HLS)$(TEMP_DIR)/%.xo: $(PROJDIR_HLS)src/*
+	make -C $(PROJDIR_HLS) all DEVICE=$(DEVICE) -j3
 
 check-devices:
 ifndef DEVICE

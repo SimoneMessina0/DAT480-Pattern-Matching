@@ -1,0 +1,7 @@
+
+tmp_*
+.Xil
+_x.*
+packaged_kernel_*
+*.log
+*.jou

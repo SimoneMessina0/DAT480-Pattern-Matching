@@ -4,7 +4,7 @@ help:
 	@echo "Makefile Usage:"
 	@echo "  make all DEVICE=<FPGA platform> kernel_list=\"<list of kernels>"\"
 	@echo "      Command to generate the xo for specified device and Interface."
-	@echo "      By default, DEVICE=xilinx_u280_xdma_201920_3 and kernel_list=\"krnl_s2mm krnl_mm2s\""
+	@echo "      By default, DEVICE=xilinx_u55c_gen3x16_xdma_3_202210_1 and kernel_list=\"krnl_s2mm krnl_mm2s\""
 	@echo ""
 	@echo "  make clean "
 	@echo "      Command to remove the generated non-hardware files."
@@ -14,14 +14,14 @@ help:
 	@echo ""
 
 
-DEVICE ?= xilinx_u280_xdma_201920_3
+DEVICE ?= xilinx_u55c_gen3x16_xdma_3_202210_1
 kernel_list ?= krnl_s2mm krnl_mm2s
 
-
+FREQ ?= 300000000
 XSA := $(strip $(patsubst %.xpfm, % , $(shell basename $(DEVICE))))
 TEMP_DIR := _x.$(XSA)
 VPP := $(XILINX_VITIS)/bin/v++
-CLFLAGS += -t hw --platform $(DEVICE) --save-temps
+CLFLAGS += --platform $(DEVICE)
 BINARY_OBJS = $(addprefix $(TEMP_DIR)/, $(addsuffix .xo, $(kernel_list)))
 
 
@@ -37,14 +37,40 @@ distclean: clean
 	rm -rf _x* .Xil
 
 $(TEMP_DIR)/krnl_mm2s.xo: src/krnl_mm2s.cpp
-	$(VPP) $(CLFLAGS) -k $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)) -c -o $@ $^
+	$(eval kernel := $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)))
+	mkdir -p $(TEMP_DIR)/$(kernel)/$(kernel)
+	echo "freqhz=$(FREQ)" > $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "[hls]" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "flow_target=vitis" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.output.format=xo" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.top=$(kernel)" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.file=../../$^" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	$(VPP) --compile --mode hls --work_dir $(TEMP_DIR)/$(kernel)/$(kernel) --config $(TEMP_DIR)/$(kernel)/$(kernel).cfg $(CLFLAGS) $^
+	ln -srnf $(TEMP_DIR)/$(kernel)/$(kernel)/$(kernel).xo $@
 
 $(TEMP_DIR)/krnl_s2mm.xo: src/krnl_s2mm.cpp
-	$(VPP) $(CLFLAGS) -k $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)) -c -o $@ $^
+	$(eval kernel := $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)))
+	mkdir -p $(TEMP_DIR)/$(kernel)/$(kernel)
+	echo "freqhz=$(FREQ)" > $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "[hls]" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "flow_target=vitis" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.output.format=xo" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.top=$(kernel)" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.file=../../$^" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	$(VPP) --compile --mode hls --work_dir $(TEMP_DIR)/$(kernel)/$(kernel) --config $(TEMP_DIR)/$(kernel)/$(kernel).cfg $(CLFLAGS) $^
+	ln -srnf $(TEMP_DIR)/$(kernel)/$(kernel)/$(kernel).xo $@
 
 $(TEMP_DIR)/krnl_counters.xo: src/krnl_counters.cpp
-	$(VPP) $(CLFLAGS) -k $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)) -c -o $@ $^
-
+	$(eval kernel := $(subst $(TEMP_DIR)/,,$(subst .xo,,$@)))
+	mkdir -p $(TEMP_DIR)/$(kernel)/$(kernel)
+	echo "freqhz=$(FREQ)" > $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "[hls]" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "flow_target=vitis" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.output.format=xo" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.top=$(kernel)" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	echo "syn.file=../../$^" >> $(TEMP_DIR)/$(kernel)/$(kernel).cfg
+	$(VPP) --compile --mode hls --work_dir $(TEMP_DIR)/$(kernel)/$(kernel) --config $(TEMP_DIR)/$(kernel)/$(kernel).cfg $(CLFLAGS) $^
+	ln -srnf $(TEMP_DIR)/$(kernel)/$(kernel)/$(kernel).xo $@
 
 check-devices:
 ifndef DEVICE

@@ -4,7 +4,7 @@ help:
 	@echo "Makefile Usage:"
 	@echo "  make all DEVICE=<FPGA platform> INTERFACE=<CMAC Interface>"
 	@echo "      Command to generate the xo for specified device and Interface."
-	@echo "      By default, DEVICE=xilinx_u280_xdma_201920_3 and INTERFACE=0"
+	@echo "      By default, DEVICE=xilinx_u55c_gen3x16_xdma_3_202210_1 and INTERFACE=0"
 	@echo "      INTERFACE can be 0, 1 or 3 (both interface 0 and 1 simultaneously)"
 	@echo ""
 	@echo "  make clean "
