@@ -152,7 +152,7 @@ endif
 
 #Check if the design name is supported
 check-design:
-	@if [[ ($(DESIGN) != "benchmark") && ($(DESIGN) != "basic") ]]; then\
+	@if [[ ($(DESIGN) != "benchmark") && ($(DESIGN) != "basic") && ($(DESIGN) != "project")]]; then\
 		echo "DESIGN=$(DESIGN) is not supported!";\
 		exit 1;\
 	fi

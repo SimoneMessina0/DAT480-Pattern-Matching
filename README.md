@@ -5,6 +5,13 @@ Get it by:
 git clone https://git.chalmers.se/magnusos/dat480_project_base.git --recursive
 ```
 
+## Getting started
+Go to either [Project_kernels_HLS](Project_kernels_HLS) or [Project_kernels_RTL](Project_kernels_RTL), depending on if you plan to implement the project in HLS or RTL, and run `make all` in that folder to set up Vitis/Vivado projects.
+
+These(as well as most of the other) folders/subprojects in this repo generate *.xo* files, *Xilinx Object files*, a kind of standardized IP-core, packages as a binary file.
+When you run `make all` in the top level of this repo, Vitis will generate a toplevel design that instanciates and connects these kernels/IP-cores according to a [config file](config_files/connectivity_project_if0.ini). Running this build takes a few hours, but generating the *.xo* files(preparing the induvidual subprojects) should be quite fast in comparison. 
+
+
 ## Interfacing the network
 The `networklayer` kernel communicates data using two AXI4-stream interfaces, `nl2sk`(tx) and `sk2nl`(rx). See the *Network Layer kernel* section below and [NetLayers/README.md](NetLayers/README.md) for how they are layed out.
 The important field for you, who only need to look at the payload of incomming packages, is `data`. The `data` field/signal is 64 bytes wide in both of the input and output stream, but as long as you define a stream that is a multiple of this, or which divides it evenly, Vitis will infere a data width converter when connecting the kernels.
@@ -16,7 +23,6 @@ void foo(hls::stream<ap_uint<8>>& input_stream, ... ) {
   ...
 }
 ```
-
 
 ## Below follows the original README.
 
