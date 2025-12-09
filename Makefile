@@ -76,6 +76,12 @@ else ifeq (project,$(DESIGN))
 #	LIST_XO += $(PROJDIR_RTL)$(TEMP_DIR)/example.xo # Example of including an RTL kernel, uncomment if needed
 # If you need more kernels, just add them here
 # Either more of your own, or from the basic/benchmark folders
+else ifeq (benchmark_project,$(DESIGN))
+	LIST_XO := $(BASICDIR)$(TEMP_DIR)/krnl_mm2s.xo # Remove previous entries 
+	LIST_XO += $(BASICDIR)$(TEMP_DIR)/krnl_s2mm.xo
+	LIST_XO += $(PROJDIR_HLS)$(TEMP_DIR)/krnl_proj.xo
+	LIST_XO += Stream_throughput_kernel/build/stream_throughput.xo
+
 else
 	$(error DESIGN=$(DESIGN) is not supported! Supported designs are: benchmark, basic, project)
 endif
@@ -133,6 +139,9 @@ $(PROJDIR_RTL)$(TEMP_DIR)/%.xo: $(PROJDIR_RTL)src/*
 $(PROJDIR_HLS)$(TEMP_DIR)/%.xo: $(PROJDIR_HLS)src/*
 	make -C $(PROJDIR_HLS) all DEVICE=$(DEVICE) -j3
 
+Stream_throughput_kernel/build/stream_throughput.xo: Stream_throughput_kernel/rtl/* Stream_throughput_kernel/frontend.*
+	make -C Stream_throughput_kernel package-rtl DEVICE=$(DEVICE)
+
 check-devices:
 ifndef DEVICE
 	$(error DEVICE not set. Please set the DEVICE properly and rerun. Run "make help" for more details.)
@@ -152,7 +161,7 @@ endif
 
 #Check if the design name is supported
 check-design:
-	@if [[ ($(DESIGN) != "benchmark") && ($(DESIGN) != "basic") && ($(DESIGN) != "project")]]; then\
+	@if [[ ($(DESIGN) != "benchmark") && ($(DESIGN) != "basic") && ($(DESIGN) != "project") && ($(DESIGN) != "benchmark_project")]]; then\
 		echo "DESIGN=$(DESIGN) is not supported!";\
 		exit 1;\
 	fi
