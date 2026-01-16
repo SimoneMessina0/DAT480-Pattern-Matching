@@ -50,7 +50,6 @@ SWITCH_IP_FOLDER ?= $(shell readlink -f ./$(BENCHMARDIR)/packaged_kernel_switch_
 LIST_XO = $(NETLAYERDIR)$(TEMP_DIR)/networklayer.xo
 
 CONFIGFLAGS = --config configuration_$(DESIGN)_if$(INTERFACE).tmp.ini
-#CONFIGFLAGS += --kernel_frequency 280
 
 # Include cmac kernel depending on the interface
 ifeq (3,$(INTERFACE))
@@ -73,9 +72,8 @@ else ifeq (basic,$(DESIGN))
 	LIST_XO += $(BASICDIR)$(TEMP_DIR)/krnl_s2mm.xo
 else ifeq (project,$(DESIGN))
 	LIST_XO += $(PROJDIR_HLS)$(TEMP_DIR)/krnl_proj.xo
-#	LIST_XO += $(PROJDIR_RTL)$(TEMP_DIR)/example.xo # Example of including an RTL kernel, uncomment if needed
-# If you need more kernels, just add them here
-# Either more of your own, or from the basic/benchmark folders
+#	LIST_XO += $(PROJDIR_RTL)$(TEMP_DIR)/example.xo 
+
 else ifeq (benchmark_project,$(DESIGN))
 	LIST_XO := $(BASICDIR)$(TEMP_DIR)/krnl_mm2s.xo # Remove previous entries 
 	LIST_XO += $(BASICDIR)$(TEMP_DIR)/krnl_s2mm.xo
@@ -118,13 +116,13 @@ distcleanall: distclean
 # Building xclbin
 $(BUILD_DIR)/${XCLBIN_NAME}.xclbin: $(LIST_XO)
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(CLFLAGS) $(CONFIGFLAGS) --temp_dir $(BUILD_DIR) -l -o'$@' $^ $(LIST_REPOS) -j 8
+	$(VPP) $(CLFLAGS) $(CONFIGFLAGS) --temp_dir $(BUILD_DIR) -l -o'$@' $^ $(LIST_REPOS) 
 
 $(BASICDIR)$(TEMP_DIR)/%.xo: $(BASICDIR)src/*.cpp
-	make -C $(BASICDIR) all DEVICE=$(DEVICE) -j3
+	make -C $(BASICDIR) all DEVICE=$(DEVICE) 
 
 $(BENCHMARDIR)$(TEMP_DIR)/%.xo: $(BENCHMARDIR)src/*
-	make -C $(BENCHMARDIR) all DEVICE=$(DEVICE) -j3
+	make -C $(BENCHMARDIR) all DEVICE=$(DEVICE)
 
 $(CMACDIR)$(TEMP_DIR)/%.xo:
 	make -C $(CMACDIR) all DEVICE=$(DEVICE) INTERFACE=$(INTERFACE)
@@ -134,10 +132,10 @@ $(NETLAYERDIR)$(TEMP_DIR)/%.xo:
 	make -C $(NETLAYERDIR) all DEVICE=$(DEVICE) MAX_SOCKETS=$(MAX_SOCKETS)
 
 $(PROJDIR_RTL)$(TEMP_DIR)/%.xo: $(PROJDIR_RTL)src/*
-	make -C $(PROJDIR_RTL) all DEVICE=$(DEVICE) -j3
+	make -C $(PROJDIR_RTL) all DEVICE=$(DEVICE) 
 
 $(PROJDIR_HLS)$(TEMP_DIR)/%.xo: $(PROJDIR_HLS)src/*
-	make -C $(PROJDIR_HLS) all DEVICE=$(DEVICE) -j3
+	make -C $(PROJDIR_HLS) all DEVICE=$(DEVICE) 
 
 Stream_throughput_kernel/build/stream_throughput.xo: Stream_throughput_kernel/rtl/* Stream_throughput_kernel/frontend.*
 	make -C Stream_throughput_kernel package-rtl DEVICE=$(DEVICE)
