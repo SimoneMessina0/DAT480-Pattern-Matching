@@ -73,7 +73,18 @@ The focus of this project is on:
 * Exploring performance trade-offs in FPGA-based pattern matching
 * Integrating custom logic into an existing network-oriented FPGA framework
 
-Each major subdirectory contains self-descriptive code and auxiliary documentation.
+
+---
+
+## 📊 Performance Summary
+
+The implemented HLS-based pattern matching design achieves the following performance on an **Xilinx Alveo U55C** FPGA:
+
+* **Sustained streaming throughput:** **10 Gbit/s**
+* **FPGA resource utilization:** approximately **15%**
+* **Processing model:** fully streaming, AXI4-Stream based
+
+These results demonstrate that high-throughput pattern matching can be achieved while maintaining low overall resource usage, leaving significant headroom for additional functionality or further scaling.
 
 ---
 
