@@ -2,7 +2,7 @@
 
 [![University](https://img.shields.io/badge/University-Chalmers%20University%20of%20Technology-blue)](https://www.chalmers.se/en/)
 ![Course](https://img.shields.io/badge/Course-DAT480-informational)
-[![HLS](https://img.shields.io/badge/Language-HLS-brightgreen)](https://github.com/SimoneMessina0/DAT480-Pattern-Matching)
+[![HLS](https://img.shields.io/badge/Language-HLS-red)](https://github.com/SimoneMessina0/DAT480-Pattern-Matching)
 
 This repository contains the implementation and resources for the **DAT480 Pattern Matching** project.
 The project builds on an existing FPGA network design and extends it with custom **pattern matching functionality implemented using High-Level Synthesis (HLS)** targeting Xilinx Alveo platforms.
